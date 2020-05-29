@@ -30,13 +30,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${cloudinary.api_secret}")
     private String apiSecret;
 
-//    @Autowired
-//    private UserDetailsService userDetails;
-//
-//    @Autowired
-//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(userDetails).passwordEncoder(bCryptPasswordEncoder());
-//    }
+    @Autowired
+    private UserDetailsService userDetails;
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetails).passwordEncoder(bCryptPasswordEncoder());
+    }
 
     @Bean
     public Cloudinary cloudinaryConfig() {
