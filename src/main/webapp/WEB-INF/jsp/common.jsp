@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -12,6 +13,7 @@
 <body style="background-color: #d6e0f5">
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container">
+
         <a class="navbar-brand" href="/start"><h5 style="color: #8c8c8c">Anytask</h5></a>
         <ul class="nav navbar-nav">
             <c:choose>
@@ -34,8 +36,10 @@
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                                     <a class="dropdown-item" style="color: #8c8c8c" href="/profile">Profile</a>
-                                    <a class="dropdown-item" style="color: #8c8c8c" href="/course/courseCreate">Create
-                                        course</a>
+                                    <sec:authorize access="hasAuthority('TEACHER')">
+                                        <a class="dropdown-item" style="color: #8c8c8c" href="/course/courseCreate">Create
+                                            course</a>
+                                    </sec:authorize>
                                     <a class="dropdown-item" style="color: #8c8c8c" href="/start">Join course</a>
                                     <a class="dropdown-item" onclick="document.forms['logoutForm'].submit()"
                                        style="color: #8c8c8c">Log out</a>

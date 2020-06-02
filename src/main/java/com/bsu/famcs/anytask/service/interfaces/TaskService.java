@@ -11,7 +11,5 @@ public interface TaskService {
 
     Task save(Task task);
 
-    void update(Task entity);
-
     void delete(Task entity);
 }

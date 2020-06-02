@@ -13,4 +13,6 @@ public interface CourseService {
     Course create(Course entity);
 
     Course save(Course course);
+
+    void delete(Course course);
 }

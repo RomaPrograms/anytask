@@ -180,7 +180,6 @@
                                                 <td>${readyForReviewTaskItem.startDate}</td>
                                             </tr>
                                             </tbody>
-
                                         </c:forEach>
                                     </table>
                                 </c:when>

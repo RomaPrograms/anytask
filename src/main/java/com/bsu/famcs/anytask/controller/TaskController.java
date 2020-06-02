@@ -1,13 +1,14 @@
 package com.bsu.famcs.anytask.controller;
 
 import com.bsu.famcs.anytask.entity.*;
-import com.bsu.famcs.anytask.service.interfaces.UserService;
 import com.bsu.famcs.anytask.service.interfaces.CloudinaryService;
 import com.bsu.famcs.anytask.service.interfaces.StudentTaskStatusService;
 import com.bsu.famcs.anytask.service.interfaces.TaskService;
+import com.bsu.famcs.anytask.service.interfaces.UserService;
 import com.bsu.famcs.anytask.validator.StudentTaskStatusValidator;
 import com.bsu.famcs.anytask.validator.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -29,20 +30,18 @@ public class TaskController {
     private final UserService userService;
     private final CloudinaryService cloudinaryService;
     private final StudentTaskStatusService studentTaskStatusService;
-    private final StudentTaskStatusValidator studentTaskStatusValidator;
 
     @Autowired
     public TaskController(TaskService taskService, TaskValidator taskValidator, UserService userService,
-                          CloudinaryService cloudinaryService, StudentTaskStatusService studentTaskStatusService,
-                          StudentTaskStatusValidator studentTaskStatusValidator) {
+                          CloudinaryService cloudinaryService, StudentTaskStatusService studentTaskStatusService) {
         this.taskService = taskService;
         this.taskValidator = taskValidator;
         this.userService = userService;
         this.cloudinaryService = cloudinaryService;
         this.studentTaskStatusService = studentTaskStatusService;
-        this.studentTaskStatusValidator = studentTaskStatusValidator;
     }
 
+    @PreAuthorize("hasAuthority('TEACHER')")
     @GetMapping("/taskAdd")
     public String taskAdd(@PathVariable Course course, Model model) {
         model.addAttribute("task", new Task());
@@ -50,6 +49,7 @@ public class TaskController {
         return "taskAdd";
     }
 
+    @PreAuthorize("hasAuthority('TEACHER')")
     @PostMapping("/taskAdd")
     public String taskAdd(@PathVariable Course course, @ModelAttribute("task") Task task, BindingResult bindingResult) {
         taskValidator.validate(task, bindingResult);
@@ -84,18 +84,21 @@ public class TaskController {
         return "redirect:/course/{course}";
     }
 
+    @PreAuthorize("hasAuthority('TEACHER')")
     @GetMapping("/{task}/delete")
     public String deleteTask(@PathVariable Task task) {
         taskService.delete(task);
         return "redirect:/course/{course}";
     }
 
+    @PreAuthorize("hasAuthority('TEACHER')")
     @GetMapping("{task}/edit")
     public String taskEdit(@PathVariable Task task, Model model) {
         model.addAttribute("task", task);
         return "taskEdit";
     }
 
+    @PreAuthorize("hasAuthority('TEACHER')")
     @PostMapping("{task}/edit")
     public String taskEdit(@PathVariable Course course, @PathVariable Task task, @ModelAttribute("task") Task modelTask, BindingResult bindingResult) {
         taskValidator.validate(task, bindingResult);
@@ -105,26 +108,43 @@ public class TaskController {
 
         task.setName(task.getName());
         task.setCourse(course);
-        taskService.update(task);
+        taskService.save(task);
         return "redirect:/course/{course}";
     }
 
+    @PreAuthorize("hasAuthority('STUDENT')")
     @GetMapping("{task}/setStartDate")
     public String setStartDate(@PathVariable Task task) {
+        User user = getCurrentUser();
         String currentDate = getCurrentDate();
-        task.getStudentTaskStatus().setStartDate(currentDate);
-        task.getStudentTaskStatus().setLabel(Label.IN_PROGRESS);
-        taskService.update(task);
+        StudentTaskStatus studentTaskStatus = new StudentTaskStatus();
+        studentTaskStatus.setTask(task);
+
+        for (StudentTaskStatus i : user.getStudentTaskStatusSet()) {
+            if (i.getTask().getId() == studentTaskStatus.getTask().getId()) {
+                i.setStartDate(currentDate);
+                i.setLabel(Label.IN_PROGRESS);
+            }
+        }
+        taskService.save(task);
         return "redirect:/course/{course}";
     }
 
     //or edit with uploading
     @GetMapping("{task}/setEndDate")
     public String setEndDate(@PathVariable Task task) {
+        User user = getCurrentUser();
         String currentDate = getCurrentDate();
-        task.getStudentTaskStatus().setEndDate(currentDate);
-        task.getStudentTaskStatus().setLabel(Label.READY_FOR_REVIEW);
-        taskService.update(task);
+        StudentTaskStatus studentTaskStatus = new StudentTaskStatus();
+        studentTaskStatus.setTask(task);
+
+        for (StudentTaskStatus i : user.getStudentTaskStatusSet()) {
+            if (i.getTask().getId() == studentTaskStatus.getTask().getId()) {
+                i.setEndDate(currentDate);
+                i.setLabel(Label.READY_FOR_REVIEW);
+            }
+        }
+        taskService.save(task);
         return "redirect:/course/{course}";
     }
 
@@ -140,9 +160,7 @@ public class TaskController {
             return "studentCoursePage";
         }
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        User user = userService.findByUsername(username);
+        User user = getCurrentUser();
         String url = cloudinaryService.uploadFile(file);
 
         StudentTaskStatus studentTaskStatus = new StudentTaskStatus();
@@ -160,6 +178,7 @@ public class TaskController {
         return "redirect:/course/{course}";
     }
 
+    @PreAuthorize("hasAuthority('TEACHER')")
     @GetMapping("{task}")
     public String taskShow(@PathVariable Task task, Model model) {
         model.addAttribute("task", task);
@@ -167,14 +186,16 @@ public class TaskController {
         return "teacherTaskShow";
     }
 
-//    @GetMapping("/{task}/setReopen")
-//    public String setLabelReopenForTask(@PathVariable Task task, @PathVariable Course course) {
-//        task.getStudentTaskStatus().setLabel(Label.REOPEN);
-//        task.getStudentTaskStatus().setMark(0);
-//        taskService.update(task);
-//        return "redirect:/{course}/task/{task}";
-//    }
+    @PreAuthorize("hasAuthority('TEACHER')")
+    @GetMapping("/{task}/setReopen")
+    public String setLabelReopenForTask(@PathVariable Task task, @PathVariable Course course) {
+        task.getStudentTaskStatus().setLabel(Label.REOPEN);
+        task.getStudentTaskStatus().setMark(0);
+        taskService.save(task);
+        return "redirect:/{course}/task/{task}";
+    }
 
+    @PreAuthorize("hasAuthority('TEACHER')")
     @RequestMapping(params = {"_csrf", "mark", "user"}, value = "/{task}/check", method = RequestMethod.POST)
     public String taskCheck(@PathVariable Task task,
                             @RequestParam("user") String username,
@@ -207,5 +228,11 @@ public class TaskController {
     private String getCurrentDate() {
         LocalDateTime now = LocalDateTime.now();
         return now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    private User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        return userService.findByUsername(username);
     }
 }

@@ -32,11 +32,6 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void update(Task entity) {
-        taskRepository.saveAndFlush(entity);
-    }
-
-    @Override
     public void delete(Task entity) {
         taskRepository.delete(entity);
     }

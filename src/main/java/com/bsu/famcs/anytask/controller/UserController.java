@@ -6,6 +6,8 @@ import com.bsu.famcs.anytask.entity.User;
 import com.bsu.famcs.anytask.service.interfaces.CourseService;
 import com.bsu.famcs.anytask.service.interfaces.UserService;
 import com.bsu.famcs.anytask.validator.UserValidator;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
+import java.util.Set;
 
 @Controller
 public class UserController {
@@ -55,7 +58,7 @@ public class UserController {
         }
 
         if (logout != null) {
-         //   User user = g
+            //   User user = g
             //user.setActive(false);
             model.addAttribute("message", "You have been logged out successfully.");
         }
@@ -63,11 +66,29 @@ public class UserController {
         return "signIn";
     }
 
+    @GetMapping("/profile")
+    public String profile(Model model) {
+        User user = getCurrentUser();
+        Set<Course> teacherCourseSet = user.getTeacherCourseSet();
+        Set<Course> studentCourseSet = user.getStudentCourseSet();
+
+        model.addAttribute("user", user);
+        model.addAttribute("teacherList", teacherCourseSet);
+        model.addAttribute("studentList", studentCourseSet);
+        model.addAttribute("taskList", user.getStudentTaskStatusSet());
+        return "profile";
+    }
 
     @GetMapping({"/", "/start"})
     public String getAllCourses(Model model) {
         List<Course> courseList = courseService.findAll();
         model.addAttribute("courseList", courseList);
         return "main";
+    }
+
+    private User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        return userService.findByUsername(username);
     }
 }

@@ -6,6 +6,7 @@ import com.bsu.famcs.anytask.service.interfaces.StudentTaskStatusService;
 import com.bsu.famcs.anytask.service.interfaces.UserService;
 import com.bsu.famcs.anytask.validator.CourseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -35,12 +36,14 @@ public class CourseController {
         this.studentTaskStatusService = studentTaskStatusService;
     }
 
+    @PreAuthorize("hasAuthority('TEACHER')")
     @GetMapping("/courseCreate")
     public String courseAdd(Model model) {
         model.addAttribute("course", new Course());
         return "courseCreate";
     }
 
+    @PreAuthorize("hasAuthority('TEACHER')")
     @PostMapping("/courseCreate")
     public String courseAdd(@ModelAttribute("course") Course course, BindingResult bindingResult) {
         courseValidator.validate(course, bindingResult);
@@ -125,6 +128,41 @@ public class CourseController {
 
         userService.update(user);
         return "redirect:/course/{course}";
+    }
+
+    @PreAuthorize("hasAuthority('TEACHER')")
+    @GetMapping("/{course}/delete")
+    public String courseDelete(@PathVariable Course course) {
+        courseService.delete(course);
+        return "redirect:/profile";
+    }
+
+    @GetMapping("/{course}/leave")
+    public String courseLeave(@PathVariable Course course) {
+        User user = getCurrentUser();
+        Set<User> users = course.getStudentSet();
+        users.remove(user);
+        courseService.save(course);
+        return "redirect:/profile";
+    }
+
+    @PreAuthorize("hasAuthority('TEACHER')")
+    @GetMapping("/{course}/edit")
+    public String courseEdit(@PathVariable Course course, Model model) {
+        model.addAttribute("course", course);
+        return "courseEdit";
+    }
+
+    @PreAuthorize("hasAuthority('TEACHER')")
+    @PostMapping("/{course}/edit")
+    public String courseEdit(@PathVariable Course course, @ModelAttribute("course") Course modelCourse, BindingResult bindingResult) {
+
+        course.setName(modelCourse.getName());
+        course.setTeacher(modelCourse.getTeacher());
+        course.setTaskSet(modelCourse.getTaskSet());
+        course.setStudentSet(modelCourse.getStudentSet());
+        courseService.save(course);
+        return "redirect:/profile";
     }
 
     private User getCurrentUser() {

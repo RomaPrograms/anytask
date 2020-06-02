@@ -37,4 +37,9 @@ public class CourseServiceImpl implements CourseService {
     public Course save(Course course) {
         return courseRepository.saveAndFlush(course);
     }
+
+    @Override
+    public void delete(Course course) {
+       courseRepository.delete(course);
+    }
 }
