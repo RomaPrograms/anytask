@@ -34,7 +34,7 @@
 
         <button class="btn btn-lg btn-primary btn-block" type="submit" value="submit">Submit</button>
         <a href="/start">
-            <button class="btn btn-lg btn-primary btn-block" type="button">Cancel</button>
+            <button class="btn btn-lg btn-primary btn-block mt-2" type="button" >Cancel</button>
         </a>
     </form:form>
 </div>

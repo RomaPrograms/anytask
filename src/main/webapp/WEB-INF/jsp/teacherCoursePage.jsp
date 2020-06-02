@@ -58,16 +58,16 @@
                         <div class="card-body">
                             <c:choose>
                                 <c:when test="${not empty taskList}">
-                                    <c:forEach items="${taskList}" var="studentItem">
-                                        <table class="table display table-condensed" id="myTable"
-                                               style="border-collapse:collapse;">
-                                            <thead>
-                                            <tr>
-                                                <th>Course name</th>
-                                                <th>Due date</th>
-                                                <th>Action</th>
-                                            </tr>
-                                            </thead>
+                                    <table class="table display table-condensed" id="myTable"
+                                           style="border-collapse:collapse;">
+                                        <thead>
+                                        <tr>
+                                            <th>Course name</th>
+                                            <th>Due date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        </thead>
+                                        <c:forEach items="${taskList}" var="studentItem">
                                             <tbody>
                                             <tr data-toggle="collapse" data-target="#id${studentItem.id}"
                                                 class="accordion-toggle">
@@ -101,8 +101,8 @@
                                                 </td>
                                             </tr>
                                             </tbody>
-                                        </table>
-                                    </c:forEach>
+                                        </c:forEach>
+                                    </table>
                                 </c:when>
                                 <c:otherwise>
                                     <div class="alert alert-primary">
@@ -125,19 +125,18 @@
                          aria-labelledby="list-inProgress-list">
                         <p class="card-header"><b>Tasks in progress</b></p>
                         <div class="card-body">
-
                             <c:choose>
                                 <c:when test="${not empty inProgressTasks}">
-                                    <c:forEach items="${inProgressTasks}" var="inProgressTaskItem">
-                                        <table class="table display table-condensed"
-                                               style="border-collapse:collapse;">
-                                            <thead>
-                                            <tr>
-                                                <th>Student name</th>
-                                                <th>Task name</th>
-                                                <th>Start date</th>
-                                            </tr>
-                                            </thead>
+                                    <table class="table display table-condensed"
+                                           style="border-collapse:collapse;">
+                                        <thead>
+                                        <tr>
+                                            <th>Student name</th>
+                                            <th>Task name</th>
+                                            <th>Start date</th>
+                                        </tr>
+                                        </thead>
+                                        <c:forEach items="${inProgressTasks}" var="inProgressTaskItem">
                                             <tbody>
                                             <tr>
                                                 <td>${inProgressTaskItem.student.name} ${inProgressTaskItem.student.surname}</td>
@@ -145,9 +144,8 @@
                                                 <td>${inProgressTaskItem.startDate}</td>
                                             </tr>
                                             </tbody>
-                                        </table>
-
-                                    </c:forEach>
+                                        </c:forEach>
+                                    </table>
                                 </c:when>
                                 <c:otherwise>
                                     <div class="alert alert-primary">
@@ -162,28 +160,29 @@
                          aria-labelledby="list-inProgress-list">
                         <p class="card-header"><b>Ready for checking tasks</b></p>
                         <div class="card-body">
-
                             <c:choose>
                                 <c:when test="${not empty readyForReviewTasks}">
-                                    <c:forEach items="${readyForReviewTasks}" var="readyForReviewTaskItem">
-                                        <table class="table display table-condensed"
-                                               style="border-collapse:collapse;">
-                                            <thead>
-                                            <tr>
-                                                <th>Student name</th>
-                                                <th>Task name</th>
-                                                <th>Start date</th>
-                                            </tr>
-                                            </thead>
+                                    <table class="table display table-condensed"
+                                           style="border-collapse:collapse;">
+                                        <thead>
+                                        <tr>
+                                            <th>Student name</th>
+                                            <th>Task name</th>
+                                            <th>Start date</th>
+                                        </tr>
+                                        </thead>
+                                        <c:forEach items="${readyForReviewTasks}" var="readyForReviewTaskItem">
                                             <tbody>
+
                                             <tr>
                                                 <td>${readyForReviewTaskItem.student.name} ${readyForReviewTaskItem.student.surname}</td>
                                                 <td>${readyForReviewTaskItem.task.name}</td>
                                                 <td>${readyForReviewTaskItem.startDate}</td>
                                             </tr>
                                             </tbody>
-                                        </table>
-                                    </c:forEach>
+
+                                        </c:forEach>
+                                    </table>
                                 </c:when>
                                 <c:otherwise>
                                     <div class="alert alert-primary">
