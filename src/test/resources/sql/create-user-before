@@ -1,0 +1,4 @@
+insert into users(id, name, surname, active, login, password)
+ values(1, 'name', 'surname', 'true', 'username', 'password');
+
+insert into user_role(user_id, roles) values(1, 'TEACHER'),(1, 'STUDENT');

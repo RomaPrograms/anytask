@@ -1,13 +1,13 @@
-package com.bsu.famcs.anytask;//package com.example.demo;
-//
-//import org.junit.jupiter.api.Test;
-//import org.springframework.boot.test.context.SpringBootTest;
-//
-//@SpringBootTest
-//class DemoApplicationTests {
-//
-//    @Test
-//    void contextLoads() {
-//    }
-//
-//}
+package com.bsu.famcs.anytask;
+
+import org.junit.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+public class DemoApplicationTests {
+
+	@Test
+	public void contextLoads() {
+	}
+
+}
